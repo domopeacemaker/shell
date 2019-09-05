@@ -13,65 +13,59 @@ Some code adapted from "Fundamentos de Sistemas Operativos", Silberschatz et al.
 #endif
 #include <string.h>
 
-// -----------------------------------------------------------------------
-//  get_command() reads in the next command line, separating it into distinct tokens
-//  using whitespace as delimiters. setup() sets the args parameter as a 
-//  null-terminated string.
-// -----------------------------------------------------------------------
 
 void get_command(char inputBuffer[], int size, char *args[],int *background)
 {
-	int length, /* # of characters in the command line */
-		i,      /* loop index for accessing inputBuffer array */
-		start,  /* index where beginning of next command parameter is */
-		ct;     /* index of where to place the next parameter into args[] */
+	int length, 
+		i,      
+		start, 
+		ct;  
 
 	ct = 0;
 	*background=0;
 
-	/* read what the user enters on the command line */
+	
 	length = read(STDIN_FILENO, inputBuffer, size);  
 
 	start = -1;
 	if (length == 0)
 	{
-		printf("\nGracias por usar la Shell AMCS(R) v1.4\n\n");
-		exit(0);            /* ^d was entered, end of user command stream */
+		printf("\nGracias pixa por usar la Shell AMCS(R) v1.4\n\n");
+		exit(0);           
 	} 
 	if (length < 0){
 		perror("error reading the command");
-		exit(-1);           /* terminate with error code of -1 */
+		exit(-1);           
 	}
 
-	/* examine every character in the inputBuffer */
 	for (i=0;i<length;i++) 
 	{ 
 		switch (inputBuffer[i])
 		{
 		case ' ':
-		case '\t' :               /* argument separators */
+		case '\t' :           
 			if(start != -1)
 			{
-				args[ct] = &inputBuffer[start];    /* set up pointer */
+				args[ct] = &inputBuffer[start];   
 				ct++;
 			}
-			inputBuffer[i] = '\0'; /* add a null char; make a C string */
+			inputBuffer[i] = '\0';
 			start = -1;
 			break;
 
-		case '\n':                 /* should be the final char examined */
+		case '\n':                
 			if (start != -1)
 			{
 				args[ct] = &inputBuffer[start];     
 				ct++;
 			}
 			inputBuffer[i] = '\0';
-			args[ct] = NULL; /* no more arguments to this command */
+			args[ct] = NULL; 
 			break;
 
-		default :             /* some other character */
+		default :        
 
-			if (inputBuffer[i] == '&') // background indicator
+			if (inputBuffer[i] == '&')
 			{
 				*background  = 1;
 				if (start != -1)
@@ -80,20 +74,17 @@ void get_command(char inputBuffer[], int size, char *args[],int *background)
 					ct++;
 				}
 				inputBuffer[i] = '\0';
-				args[ct] = NULL; /* no more arguments to this command */
-				i=length; // make sure the for loop ends now
+				args[ct] = NULL; 
+				i=length;
 
 			}
-			else if (start == -1) start = i;  // start of new argument
-		}  // end switch
-	}  // end for   
-	args[ct] = NULL; /* just in case the input line was > MAXLINE */
+			else if (start == -1) start = i;  
+		}  
+	}  
+	args[ct] = NULL; 
 } 
 
 
-// -----------------------------------------------------------------------
-/* devuelve puntero a un nodo con sus valores inicializados,
-devuelve NULL si no pudo realizarse la reserva de memoria*/
 job * new_job(pid_t pid, const char * command, enum job_state state)
 {
 	job * aux;
@@ -105,8 +96,6 @@ job * new_job(pid_t pid, const char * command, enum job_state state)
 	return aux;
 }
 
-// -----------------------------------------------------------------------
-/* inserta elemento en la cabeza de la lista */
 void add_job (job * list, job * item)
 {
 	job * aux=list->next;
@@ -116,9 +105,6 @@ void add_job (job * list, job * item)
 
 }
 
-// -----------------------------------------------------------------------
-/* elimina el elemento indicado de la lista 
-devuelve 0 si no pudo realizarse con exito */
 int delete_job(job * list, job * item)
 {
 	job * aux=list;
@@ -135,9 +121,7 @@ int delete_job(job * list, job * item)
 		return 0;
 
 }
-// -----------------------------------------------------------------------
-/* busca y devuelve un elemento de la lista cuyo pid coincida con el indicado,
-devuelve NULL si no lo encuentra */
+
 job * get_item_bypid  (job * list, pid_t pid)
 {
 	job * aux=list;
@@ -154,16 +138,12 @@ job * get_item_bypos( job * list, int n)
 	return aux->next;
 }
 
-// -----------------------------------------------------------------------
-/*imprime una linea en el terminal con los datos del elemento: pid, nombre ... */
 void print_item(job * item)
 {
 
 	printf("pid: %d, command: %s, state: %s\n", item->pgid, item->command, state_strings[item->state]);
 }
 
-// -----------------------------------------------------------------------
-/*recorre la lista y le aplica la funcion pintar a cada elemento */
 void print_list(job * list, void (*print)(job *))
 {
 	int n=1;
@@ -178,8 +158,6 @@ void print_list(job * list, void (*print)(job *))
 	}
 }
 
-// -----------------------------------------------------------------------
-/* interpretar valor estatus que devuelve wait */
 enum status analyze_status(int status, int *info)
 {
 	if (WIFSTOPPED (status))
@@ -198,32 +176,27 @@ enum status analyze_status(int status, int *info)
 	return;
 }
 
-// -----------------------------------------------------------------------
-// cambia la accion de las seÃ±ales relacionadas con el terminal
 void terminal_signals(void (*func) (int))
 {
-	signal (SIGINT,  func); // crtl+c interrupt tecleado en el terminal
-	signal (SIGQUIT, func); // ctrl+\ quit tecleado en el terminal
-	signal (SIGTSTP, func); // crtl+z Stop tecleado en el terminal
-	signal (SIGTTIN, func); // proceso en segundo plano quiere leer del terminal 
-	signal (SIGTTOU, func); // proceso en segundo plano quiere escribir en el terminal
+	signal (SIGINT,  func);
+	signal (SIGQUIT, func);
+	signal (SIGTSTP, func);
+	signal (SIGTTIN, func);
+	signal (SIGTTOU, func);
 }		
 
 // -----------------------------------------------------------------------
 void block_signal(int signal, int block)
 {
-	/* declara e inicializa máscara */
 	sigset_t block_sigchld;
 	sigemptyset(&block_sigchld );
 	sigaddset(&block_sigchld,signal);
 	if(block)
 	{
-		/* bloquea señal */
 		sigprocmask(SIG_BLOCK, &block_sigchld, NULL);
 	}
 	else
 	{
-		/* desbloquea señal */
 		sigprocmask(SIG_UNBLOCK, &block_sigchld, NULL);
 	}
 }
