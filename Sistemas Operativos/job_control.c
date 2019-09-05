@@ -167,7 +167,6 @@ enum status analyze_status(int status, int *info)
 	}
 	else
 	{
-		// el proceso termio
 		if (WIFSIGNALED (status))
 		{ *info=WTERMSIG (status); return(SIGNALED);}
 		else
