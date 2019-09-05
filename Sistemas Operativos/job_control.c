@@ -128,7 +128,7 @@ job * get_item_bypid  (job * list, pid_t pid)
 	while(aux->next!= NULL && aux->next->pgid != pid) aux=aux->next;
 	return aux->next;
 }
-// -----------------------------------------------------------------------
+
 job * get_item_bypos( job * list, int n)
 {
 	job * aux=list;
@@ -184,7 +184,6 @@ void terminal_signals(void (*func) (int))
 	signal (SIGTTOU, func);
 }		
 
-// -----------------------------------------------------------------------
 void block_signal(int signal, int block)
 {
 	sigset_t block_sigchld;
