@@ -6,7 +6,7 @@ Sistemas Operativos
 Grados I. Informatica, Computadores & Software
 Dept. Arquitectura de Computadores - UMA
 
-Some code adapted from "Fundamento de Sistemas Operativos", Silberschatz et al.
+Some code adapted from "Fundamentos de Sistemas Operativos", Silberschatz et al.
 
 To compile and run the program:
    $ gcc Shell_project.c job_control.c -o Shell
