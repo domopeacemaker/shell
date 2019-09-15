@@ -1,6 +1,6 @@
 /**
 UNIX Shell Project
-
+Autor: Juan Alvaro Caravaca Seliva, Computadores A
 Sistemas Operativos
 Grados I. Informatica, Computadores & Software
 Dept. Arquitectura de Computadores - UMA
@@ -34,7 +34,6 @@ void jobs(){
 	}
 }
 
-
 void cd(char * args[]){
 	if(args[1]==NULL){
 		printf("No se ha introducido el directorio.\n");
@@ -43,7 +42,7 @@ void cd(char * args[]){
 	}else {
 		if(chdir(args[1])==0){
 			if(strcmp(args[1],"..")==0){
-				printf("Volvemos al directorio anterior.\n");			
+				printf("Se vuelve al directorio anterior.\n");			
 			}else{
 				printf("Se ha accedido al directorio %s.\n", args[1]);				
 			}				
@@ -52,32 +51,6 @@ void cd(char * args[]){
 		}
 	}
 }
-
-
-void fg(char * args[]){
-	int cont = 1, pid_wait, status;
-	job * aux;
-	if(lista->next == NULL){
-		printf("No hay procesos suspendidos o en segundo plano.\n");
-	}else if(args[1] != NULL && (list_size(lista)<atoi(args[1]) || 0>atoi(args[1]))){
-			printf("La lista tiene menos procesos de los exigidos.\n");
-	}else{
-		if(args[1]!=NULL){
-			cont=atoi(args[1]);
-		}
-		aux = get_item_bypos(lista,cont);
-		set_terminal(aux->pgid);
-		aux->state=FOREGROUND;
-		killpg(aux->pgid,SIGCONT);
-		pid_wait=waitpid(aux->pgid,&status,WUNTRACED); 
-		if(pid_wait==aux->pgid){
-			printf("El proceso %d ha terminado.\n",aux->pgid);
-			cont=delete_job(lista,aux);
-		}
-		set_terminal(getpid());
-	}
-}
-
 
 void bg(char * args[]){
 	int cont = 1;
@@ -96,6 +69,29 @@ void bg(char * args[]){
 	}
 }
 
+void fg(char * args[]){
+	int cont = 1, pid_wait, status;
+	job * aux;
+	if(lista->next == NULL){
+		printf("No hay procesos suspendidos o en segundo plano.\n");
+	}else if(args[1] != NULL && (list_size(lista)<atoi(args[1]) || 0>atoi(args[1]))){
+			printf("La lista tiene menos procesos de los exigidos.\n");
+	}else{
+		if(args[1]!=NULL){
+			cont=atoi(args[1]);
+		}
+		aux = get_item_bypos(lista,cont);
+		set_terminal(aux->pgid);
+		aux->state=FOREGROUND;
+		killpg(aux->pgid,SIGCONT);
+		pid_wait=waitpid(aux->pgid,&status,WUNTRACED); 
+		if(pid_wait==aux->pgid){
+			printf("El proceso %d ha terminado, pixa.\n",aux->pgid);
+			cont=delete_job(lista,aux);
+		}
+		set_terminal(getpid());
+	}
+}
 
 void manejador (int signal){
 	enum status status_res;
@@ -123,13 +119,11 @@ void manejador (int signal){
 	}
 }
 
-
 H * nueva_lista(char * c){
 	H* aux = (H *) malloc(sizeof(H));
 	aux->command = c;
 	return aux;
 }
-
 
 int tam (H * l){
 	H* aux=l;
@@ -141,41 +135,12 @@ int tam (H * l){
 	return cont;
 }
 
-
-H * new_command(const char * c){
-	H * aux;
-	aux = (H *) malloc(sizeof(H));
-	aux->command = strdup(c);
-	aux->next = NULL;
-	return aux;
-}
-
-
-void almacenar(H * list, H * item){
-	H * aux = list->next;
-	list->next = item;
-	item->next = aux;
-}
-
-
-H * get_command_bypos(H * l, int pos){
-	H * aux = l;
-	if(pos<1||pos>tam(l)) return NULL;
-	pos++;
-	while(aux->next != NULL && pos){
-		aux= aux->next;
-		pos--;
-	}
-	return aux;
-}
-
-
 void historial(char * args[]){
 	int cont=1;
 	H * aux;
 	if(args[1] != NULL){
 		if(tam(listaH)<atoi(args[1]) || 0>atoi(args[1])){
-			printf("No hay suficientes comandos en el historial.\n");
+			printf("No hay comandos suficientes en el historial.\n");
 		}else{
 			cont = atoi(args[1]);
 			aux = get_command_bypos(listaH,cont);
@@ -195,6 +160,30 @@ void historial(char * args[]){
 	}
 }
 
+H * new_command(const char * c){
+	H * aux;
+	aux = (H *) malloc(sizeof(H));
+	aux->command = strdup(c);
+	aux->next = NULL;
+	return aux;
+}
+
+void almacenar(H * list, H * item){
+	H * aux = list->next;
+	list->next = item;
+	item->next = aux;
+}
+
+H * get_command_bypos(H * l, int pos){
+	H * aux = l;
+	if(pos<1||pos>tam(l)) return NULL;
+	pos++;
+	while(aux->next != NULL && pos){
+		aux= aux->next;
+		pos--;
+	}
+	return aux;
+}
 
 int main(void)
 {
@@ -224,7 +213,7 @@ int main(void)
 			historial(args);
 			if(args[1]!=NULL){
 				if((args[1]!=NULL)&&(strcmp(comando,"historial")==0)){
-					printf(" -> ya está ejecutandose(justo arriba).\n");
+					printf(" -> ya se esta ejecutando arriba.\n");
 					continue;
 				}else{
 					args[0]=comando;
