@@ -1,6 +1,6 @@
 /**
 UNIX Shell Project
-
+Autor: Juan Alvaro Caravaca Seliva, Computadores A
 Sistemas Operativos
 Grados I. Informatica, Computadores & Software
 Dept. Arquitectura de Computadores - UMA
@@ -34,7 +34,6 @@ void jobs(){
 	}
 }
 
-
 void cd(char * args[]){
 	if(args[1]==NULL){
 		printf("No se ha introducido el directorio.\n");
@@ -43,7 +42,7 @@ void cd(char * args[]){
 	}else {
 		if(chdir(args[1])==0){
 			if(strcmp(args[1],"..")==0){
-				printf("Volvemos al directorio anterior.\n");			
+				printf("Se vuelve al directorio anterior.\n");			
 			}else{
 				printf("Se ha accedido al directorio %s.\n", args[1]);				
 			}				
@@ -52,7 +51,6 @@ void cd(char * args[]){
 		}
 	}
 }
-
 
 void fg(char * args[]){
 	int cont = 1, pid_wait, status;
@@ -71,13 +69,12 @@ void fg(char * args[]){
 		killpg(aux->pgid,SIGCONT);
 		pid_wait=waitpid(aux->pgid,&status,WUNTRACED); 
 		if(pid_wait==aux->pgid){
-			printf("El proceso %d ha terminado.\n",aux->pgid);
+			printf("El proceso %d ha terminado, pixa.\n",aux->pgid);
 			cont=delete_job(lista,aux);
 		}
 		set_terminal(getpid());
 	}
 }
-
 
 void bg(char * args[]){
 	int cont = 1;
@@ -95,7 +92,6 @@ void bg(char * args[]){
 		killpg(aux->pgid,SIGCONT);
 	}
 }
-
 
 void manejador (int signal){
 	enum status status_res;
@@ -123,13 +119,11 @@ void manejador (int signal){
 	}
 }
 
-
 H * nueva_lista(char * c){
 	H* aux = (H *) malloc(sizeof(H));
 	aux->command = c;
 	return aux;
 }
-
 
 int tam (H * l){
 	H* aux=l;
@@ -141,7 +135,6 @@ int tam (H * l){
 	return cont;
 }
 
-
 H * new_command(const char * c){
 	H * aux;
 	aux = (H *) malloc(sizeof(H));
@@ -150,13 +143,11 @@ H * new_command(const char * c){
 	return aux;
 }
 
-
 void almacenar(H * list, H * item){
 	H * aux = list->next;
 	list->next = item;
 	item->next = aux;
 }
-
 
 H * get_command_bypos(H * l, int pos){
 	H * aux = l;
@@ -168,7 +159,6 @@ H * get_command_bypos(H * l, int pos){
 	}
 	return aux;
 }
-
 
 void historial(char * args[]){
 	int cont=1;
@@ -194,7 +184,6 @@ void historial(char * args[]){
 		}
 	}
 }
-
 
 int main(void)
 {
